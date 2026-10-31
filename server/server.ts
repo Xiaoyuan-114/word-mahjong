@@ -1,9 +1,20 @@
 import { createServer as createHttpServer, type Server as HttpServer } from 'node:http';
 import type { Express } from 'express';
 import { Server as SocketServer } from 'socket.io';
+import type {
+  ClientToServerEvents,
+  InterServerEvents,
+  ServerToClientEvents,
+  SocketData,
+} from '@shared/types';
 import { systemClock, type Clock } from './clock';
 import { defaultTimers, SERVER_PORT, type ServerTimers } from './config';
 import { createHttpApp } from './httpApp';
+import { RoomManager } from './rooms/RoomManager';
+import { RoomService } from './rooms/roomService';
+import { RoomTimerScheduler } from './rooms/timerScheduler';
+import { registerHandlers } from './socket/registerHandlers';
+import type { TypedServer } from './socket/types';
 
 export interface GameServerOptions {
   port?: number;
@@ -14,10 +25,13 @@ export interface GameServerOptions {
 export interface GameServer {
   app: Express;
   httpServer: HttpServer;
-  io: SocketServer;
+  io: TypedServer;
   port: number;
   timers: ServerTimers;
   clock: Clock;
+  manager: RoomManager;
+  service: RoomService;
+  scheduler: RoomTimerScheduler;
   listen(port?: number): Promise<number>;
   close(): Promise<void>;
 }
@@ -28,14 +42,24 @@ export function createGameServer(options: GameServerOptions = {}): GameServer {
   const clock = options.clock ?? systemClock;
   const app = createHttpApp();
   const httpServer = createHttpServer(app);
-  const io = new SocketServer(httpServer, {
+  const io: TypedServer = new SocketServer<
+    ClientToServerEvents,
+    ServerToClientEvents,
+    InterServerEvents,
+    SocketData
+  >(httpServer, {
     cors: { origin: true },
     serveClient: false,
   });
 
-  io.on('connection', (socket) => {
-    socket.emit('notice', { level: 'info', message: '已连接到牌桌服务' });
+  const manager = new RoomManager(clock, timers);
+  let service!: RoomService;
+  const scheduler = new RoomTimerScheduler(clock, timers, (room, now) => {
+    service.timeout(room, now);
   });
+  service = new RoomService(io, manager, scheduler, clock, timers);
+  registerHandlers(io, service, clock);
+  manager.startSweeper((room) => service.closeRoom(room, '房间闲置太久'));
 
   return {
     app,
@@ -44,6 +68,9 @@ export function createGameServer(options: GameServerOptions = {}): GameServer {
     port,
     timers,
     clock,
+    manager,
+    service,
+    scheduler,
     listen(listenPort = port) {
       return new Promise<number>((resolve, reject) => {
         const onError = (error: Error) => {
@@ -59,14 +86,14 @@ export function createGameServer(options: GameServerOptions = {}): GameServer {
       });
     },
     close() {
+      service.dispose();
+      manager.stopSweeper();
       return new Promise<void>((resolve, reject) => {
-        io.close((error) => {
-          if (error) {
-            reject(error);
-            return;
-          }
-          resolve();
-        });
+        try {
+          io.close(() => resolve());
+        } catch (error) {
+          reject(error instanceof Error ? error : new Error(String(error)));
+        }
       });
     },
   };
