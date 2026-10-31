@@ -1,0 +1,62 @@
+:root {
+  color-scheme: light;
+  --paper: #f6efe3;
+  --paper-deep: #eadcc6;
+  --paper-light: #fffaf0;
+  --ink: #26221d;
+  --ink-soft: #5b5348;
+  --ink-faint: #8d8272;
+  --jade: #3f7d6a;
+  --jade-deep: #2c5a4d;
+  --jade-wash: #dcebe1;
+  --vermilion: #b4422f;
+  --vermilion-wash: #f4ded7;
+  --gold: #c9a227;
+  --line: rgba(70, 56, 38, 0.16);
+  --shadow: 0 16px 40px rgba(63, 48, 28, 0.12);
+  --serif: "Noto Serif SC", "Songti SC", STSong, "SimSun", serif;
+  --sans: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+  font-family: var(--sans);
+  background: var(--paper);
+  color: var(--ink);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(201, 162, 39, 0.1), transparent 34%),
+    radial-gradient(circle at 88% 84%, rgba(63, 125, 106, 0.12), transparent 38%),
+    linear-gradient(135deg, var(--paper-light), var(--paper) 48%, var(--paper-deep));
+  color: var(--ink);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: var(--jade-deep);
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
