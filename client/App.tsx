@@ -1,31 +1,45 @@
-import { useEffect, useState } from 'react';
-import { socket } from './socket';
+import { ConfirmDialog } from './components/ConfirmDialog';
+import { Toast } from './components/Toast';
+import { GameScreen } from './screens/GameScreen';
+import { HomeScreen } from './screens/HomeScreen';
+import { LobbyScreen } from './screens/LobbyScreen';
+import { useStore } from './store';
 
 export function App() {
-  const [connected, setConnected] = useState(socket.connected);
-
-  useEffect(() => {
-    const handleConnect = () => setConnected(true);
-    const handleDisconnect = () => setConnected(false);
-    socket.on('connect', handleConnect);
-    socket.on('disconnect', handleDisconnect);
-    return () => {
-      socket.off('connect', handleConnect);
-      socket.off('disconnect', handleDisconnect);
-    };
-  }, []);
+  const snapshot = useStore((state) => state.snapshot);
+  const connected = useStore((state) => state.connected);
+  const resuming = useStore((state) => state.resuming);
 
   return (
-    <main className="home">
-      <section className="home-card">
-        <p className="eyebrow">文字麻将 · MVP</p>
-        <h1>一桌好字</h1>
-        <p className="lede">摸字、抢字、组句，让朋友投票认不认。</p>
-        <div className={`conn ${connected ? 'is-online' : ''}`}>
+    <div className="app">
+      {snapshot ? (
+        snapshot.status === 'lobby' ? (
+          <LobbyScreen />
+        ) : (
+          <GameScreen />
+        )
+      ) : (
+        <HomeScreen />
+      )}
+
+      {!connected && (
+        <div className="connection-banner" role="status">
           <span className="conn-dot" />
-          {connected ? '牌桌服务已连接' : '连接中…'}
+          连接中断，正在重连…
         </div>
-      </section>
-    </main>
+      )}
+
+      {resuming && (
+        <div className="resume-overlay" role="status">
+          <div className="resume-card">
+            <span className="spinner" aria-hidden="true" />
+            <p>正在恢复你的牌桌…</p>
+          </div>
+        </div>
+      )}
+
+      <Toast />
+      <ConfirmDialog />
+    </div>
   );
 }

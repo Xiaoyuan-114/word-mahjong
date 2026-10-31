@@ -1,19 +1,33 @@
 :root {
   color-scheme: light;
   --paper: #f6efe3;
-  --paper-deep: #eadcc6;
   --paper-light: #fffaf0;
+  --paper-deep: #eadcc6;
+  --panel: rgba(255, 250, 240, 0.76);
+  --panel-strong: #fffaf0;
   --ink: #26221d;
   --ink-soft: #5b5348;
   --ink-faint: #8d8272;
   --jade: #3f7d6a;
   --jade-deep: #2c5a4d;
   --jade-wash: #dcebe1;
+  --jade-mist: rgba(63, 125, 106, 0.1);
   --vermilion: #b4422f;
+  --vermilion-deep: #8f3324;
   --vermilion-wash: #f4ded7;
   --gold: #c9a227;
+  --gold-wash: #f3e7c8;
+  --table: #e6e9da;
+  --table-deep: #d5ddc7;
   --line: rgba(70, 56, 38, 0.16);
+  --line-strong: rgba(70, 56, 38, 0.28);
+  --shadow-sm: 0 4px 14px rgba(63, 48, 28, 0.08);
   --shadow: 0 16px 40px rgba(63, 48, 28, 0.12);
+  --shadow-lg: 0 28px 80px rgba(49, 37, 22, 0.2);
+  --radius-xl: 30px;
+  --radius-lg: 22px;
+  --radius-md: 15px;
+  --radius-sm: 10px;
   --serif: "Noto Serif SC", "Songti SC", STSong, "SimSun", serif;
   --sans: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
   font-family: var(--sans);
@@ -33,21 +47,35 @@ body,
 
 body {
   margin: 0;
+  min-width: 320px;
   background:
-    radial-gradient(circle at 12% 8%, rgba(201, 162, 39, 0.1), transparent 34%),
-    radial-gradient(circle at 88% 84%, rgba(63, 125, 106, 0.12), transparent 38%),
-    linear-gradient(135deg, var(--paper-light), var(--paper) 48%, var(--paper-deep));
+    radial-gradient(circle at 10% 6%, rgba(201, 162, 39, 0.12), transparent 32%),
+    radial-gradient(circle at 90% 86%, rgba(63, 125, 106, 0.14), transparent 38%),
+    linear-gradient(135deg, var(--paper-light), var(--paper) 46%, var(--paper-deep));
   color: var(--ink);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+#root {
+  min-height: 100vh;
 }
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
+  color: inherit;
 }
 
 button {
   cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
 }
 
 a {
@@ -57,6 +85,30 @@ a {
 h1,
 h2,
 h3,
-p {
+p,
+dl,
+dd,
+dt {
   margin: 0;
+}
+
+ol,
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:focus-visible {
+  outline: 3px solid rgba(63, 125, 106, 0.42);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--jade-wash);
+}
+
+.app {
+  min-height: 100vh;
+  position: relative;
 }

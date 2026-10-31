@@ -123,6 +123,7 @@ export type PhaseView =
       eligibleSeats: number[];
       respondedSeats: number[];
       youAreEligible: boolean;
+      yourResponse: 'take' | 'pass' | null;
       deadline: number;
     }
   | {

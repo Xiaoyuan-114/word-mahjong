@@ -154,6 +154,7 @@ function buildPhaseView(room: Room, viewer: RoomPlayer, game: GameState): PhaseV
         eligibleSeats: [...phase.eligibleSeats],
         respondedSeats: Object.keys(phase.responses).map(Number),
         youAreEligible: phase.eligibleSeats.includes(viewer.seat),
+        yourResponse: phase.responses[viewer.seat] ?? null,
         deadline: room.timerDeadline ?? phase.deadline,
       };
     case 'vote': {
